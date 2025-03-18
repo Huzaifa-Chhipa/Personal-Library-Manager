@@ -1,9 +1,5 @@
-# Simple Personal Library Manager
-
-# List to store books
 library = []
 
-# Function to add a book
 def add_book():
     title = input("Enter the book title: ")
     author = input("Enter the author: ")
@@ -21,7 +17,6 @@ def add_book():
     library.append(book)
     print("Book added successfully!")
 
-# Function to remove a book
 def remove_book():
     title = input("Enter the title of the book to remove: ")
     for book in library:
@@ -31,7 +26,6 @@ def remove_book():
             return
     print("Book not found.")
 
-# Function to search for a book
 def search_book():
     search_term = input("Enter the title or author to search: ").lower()
     matching_books = [book for book in library if search_term in book["title"].lower() or search_term in book["author"].lower()]
@@ -44,7 +38,6 @@ def search_book():
     else:
         print("No matching books found.")
 
-# Function to display all books
 def display_books():
     if not library:
         print("Your library is empty.")
@@ -55,7 +48,6 @@ def display_books():
         status = "Read" if book["read"] else "Unread"
         print(f"{i}. {book['title']} by {book['author']} ({book['year']}) - {book['genre']} - {status}")
 
-# Function to display statistics
 def display_statistics():
     total_books = len(library)
     read_books = sum(book["read"] for book in library)
@@ -64,7 +56,6 @@ def display_statistics():
     print(f"Total books: {total_books}")
     print(f"Percentage read: {percentage_read:.1f}%")
 
-# Main menu
 def main_menu():
     while True:
         print("\nWelcome to your Personal Library Manager!")
@@ -93,6 +84,5 @@ def main_menu():
         else:
             print("Invalid choice. Please try again.")
 
-# Run the program
 if __name__ == "__main__":
     main_menu()
