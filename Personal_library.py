@@ -1,103 +1,98 @@
-import streamlit as st
+# Simple Personal Library Manager
 
-# Initialize the library in session state
-if "library" not in st.session_state:
-    st.session_state.library = []
+# List to store books
+library = []
 
+# Function to add a book
 def add_book():
-    """Add a book to the library."""
-    st.subheader("Add a Book")
-    title = st.text_input("Title")
-    author = st.text_input("Author")
-    year = st.number_input("Publication Year", min_value=1800, max_value=2100, step=1)
-    genre = st.text_input("Genre")
-    read_status = st.checkbox("Have you read this book?")
+    title = input("Enter the book title: ")
+    author = input("Enter the author: ")
+    year = int(input("Enter the publication year: "))
+    genre = input("Enter the genre: ")
+    read_status = input("Have you read this book? (yes/no): ").lower() == "yes"
+    
+    book = {
+        "title": title,
+        "author": author,
+        "year": year,
+        "genre": genre,
+        "read": read_status
+    }
+    library.append(book)
+    print("Book added successfully!")
 
-    if st.button("Add Book"):
-        if title and author and genre:
-            book = {
-                "title": title,
-                "author": author,
-                "year": year,
-                "genre": genre,
-                "read_status": read_status
-            }
-            st.session_state.library.append(book)
-            st.success("Book added successfully!")
-        else:
-            st.error("Please fill in all fields.")
-
+# Function to remove a book
 def remove_book():
-    """Remove a book from the library."""
-    st.subheader("Remove a Book")
-    if st.session_state.library:
-        titles = [book["title"] for book in st.session_state.library]
-        selected_title = st.selectbox("Select a book to remove", titles)
-        if st.button("Remove Book"):
-            st.session_state.library = [book for book in st.session_state.library if book["title"] != selected_title]
-            st.success("Book removed successfully!")
-    else:
-        st.warning("Your library is empty.")
+    title = input("Enter the title of the book to remove: ")
+    for book in library:
+        if book["title"].lower() == title.lower():
+            library.remove(book)
+            print("Book removed successfully!")
+            return
+    print("Book not found.")
 
+# Function to search for a book
 def search_book():
-    """Search for a book by title or author."""
-    st.subheader("Search for a Book")
-    search_option = st.radio("Search by:", ["Title", "Author"])
-    search_term = st.text_input(f"Enter the {search_option.lower()}:")
-
-    if search_term:
-        if search_option == "Title":
-            results = [book for book in st.session_state.library if search_term.lower() in book["title"].lower()]
-        else:
-            results = [book for book in st.session_state.library if search_term.lower() in book["author"].lower()]
-
-        if results:
-            st.write("Matching Books:")
-            for book in results:
-                status = "Read" if book["read_status"] else "Unread"
-                st.write(f"- **{book['title']}** by {book['author']} ({book['year']}) - {book['genre']} - {status}")
-        else:
-            st.warning("No matching books found.")
-
-def display_all_books():
-    """Display all books in the library."""
-    st.subheader("Your Library")
-    if st.session_state.library:
-        for i, book in enumerate(st.session_state.library, 1):
-            status = "Read" if book["read_status"] else "Unread"
-            st.write(f"{i}. **{book['title']}** by {book['author']} ({book['year']}) - {book['genre']} - {status}")
+    search_term = input("Enter the title or author to search: ").lower()
+    matching_books = [book for book in library if search_term in book["title"].lower() or search_term in book["author"].lower()]
+    
+    if matching_books:
+        print("Matching Books:")
+        for i, book in enumerate(matching_books, 1):
+            status = "Read" if book["read"] else "Unread"
+            print(f"{i}. {book['title']} by {book['author']} ({book['year']}) - {book['genre']} - {status}")
     else:
-        st.warning("Your library is empty.")
+        print("No matching books found.")
 
+# Function to display all books
+def display_books():
+    if not library:
+        print("Your library is empty.")
+        return
+    
+    print("Your Library:")
+    for i, book in enumerate(library, 1):
+        status = "Read" if book["read"] else "Unread"
+        print(f"{i}. {book['title']} by {book['author']} ({book['year']}) - {book['genre']} - {status}")
+
+# Function to display statistics
 def display_statistics():
-    """Display library statistics."""
-    st.subheader("Library Statistics")
-    total_books = len(st.session_state.library)
-    read_books = sum(book["read_status"] for book in st.session_state.library)
+    total_books = len(library)
+    read_books = sum(book["read"] for book in library)
     percentage_read = (read_books / total_books * 100) if total_books > 0 else 0
+    
+    print(f"Total books: {total_books}")
+    print(f"Percentage read: {percentage_read:.1f}%")
 
-    st.write(f"Total books: {total_books}")
-    st.write(f"Percentage read: {percentage_read:.1f}%")
+# Main menu
+def main_menu():
+    while True:
+        print("\nWelcome to your Personal Library Manager!")
+        print("1. Add a book")
+        print("2. Remove a book")
+        print("3. Search for a book")
+        print("4. Display all books")
+        print("5. Display statistics")
+        print("6. Exit")
+        
+        choice = input("Enter your choice: ")
+        
+        if choice == "1":
+            add_book()
+        elif choice == "2":
+            remove_book()
+        elif choice == "3":
+            search_book()
+        elif choice == "4":
+            display_books()
+        elif choice == "5":
+            display_statistics()
+        elif choice == "6":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
 
-def main():
-    """Main function to run the Streamlit app."""
-    st.title("Personal Library Manager 📚")
-
-    # Sidebar menu
-    st.sidebar.title("Menu")
-    options = ["Add a Book", "Remove a Book", "Search for a Book", "Display All Books", "Display Statistics"]
-    choice = st.sidebar.radio("Select an option", options)
-
-    if choice == "Add a Book":
-        add_book()
-    elif choice == "Remove a Book":
-        remove_book()
-    elif choice == "Search for a Book":
-        search_book()
-    elif choice == "Display All Books":
-        display_all_books()
-    elif choice == "Display Statistics":
-        display_statistics()
-
+# Run the program
 if __name__ == "__main__":
-    main()
+    main_menu()
